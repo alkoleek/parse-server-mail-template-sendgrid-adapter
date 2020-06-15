@@ -79,32 +79,22 @@ var replacePlaceHolder = function replacePlaceHolder(text, options) {
 };
 
 function sendTemplate(params) {
-  var sendgrid = require('sendgrid')(params.apiKey);
-  var email = params.email,
-      link = params.link,
-      username = params.username,
-      appName = params.appName,
-      fromAddress = params.fromAddress,
-      templateId = params.templateId;
+  const sendgrid = require('@sendgrid/mail');
+  sendgrid.setApiKey(params.apiKey);
 
-  var template_id = templateId;
-  var request = sendgrid.emptyRequest();
-  request.body = {
-    from: { email: fromAddress },
-    personalizations: [{
-      to: [{
-        email: email
-      }],
-      substitutions: {
-        '%link%': link,
-        '%email%': email,
-        '%username%': username,
-        '%appname%': appName
-      }
-    }],
-    template_id: template_id
+  const { email, link, username, appName, fromAddress, templateId } = params;
+  const msg = {
+    to: email,
+    from: fromAddress,
+
+    templateId: templateId,
+    dynamic_template_data: {
+        'link': link,
+        'email': email,
+        'username': username,
+        'appname': appName
+    },
   };
-  request.method = 'POST';
-  request.path = '/v3/mail/send';
-  return sendgrid.API(request);
+
+  return sendgrid.send(msg);
 }
