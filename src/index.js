@@ -69,30 +69,22 @@ const replacePlaceHolder = (text, options) =>
     .replace(/%link%/g, options.link);
 
 function sendTemplate(params) {
-  const sendgrid = require('sendgrid')(params.apiKey);
+  const sendgrid = require('@sendgrid/mail');
+  sendgrid.setApiKey(params.apiKey);
+
   const { email, link, username, appName, fromAddress, templateId } = params;
-  const template_id = templateId;
-  const request = sendgrid.emptyRequest();
-  request.body = {
-    from: { email: fromAddress },
-    personalizations: [
-      {
-        to: [
-          {
-            email
-          }
-        ],
-        substitutions: {
-          '%link%': link,
-          '%email%': email,
-          '%username%': username,
-          '%appname%': appName
-        }
-      }
-    ],
-    template_id
+  const msg = {
+    to: email,
+    from: fromAddress,
+
+    templateId: templateId,
+    dynamic_template_data: {
+        'link': link,
+        'email': email,
+        'username': username,
+        'appname': appName
+    },
   };
-  request.method = 'POST';
-  request.path = '/v3/mail/send';
-  return sendgrid.API(request);
+
+  return sendgrid.send(msg);
 }
