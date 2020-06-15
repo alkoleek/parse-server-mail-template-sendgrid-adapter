@@ -28,6 +28,6 @@
     "jest": "^22.3.0"
   },
   "dependencies": {
-    "sendgrid": "^5.2.3"
+    "@sendgrid/mail": "^6.3.1"
   }
 }
